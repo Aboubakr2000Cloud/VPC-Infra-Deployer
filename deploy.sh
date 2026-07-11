@@ -16,9 +16,8 @@ VPC_ID=$(aws ec2 create-vpc \
   --query 'Vpc.VpcId' \
   --output text \
   --tag-specifications "ResourceType=vpc,Tags=[
-    {Key=Name,Value=week12-vpc},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-vpc},
+    {Key=Project,Value=$PROJECT_TAG}
   ]")
 
 # Enable DNS hostnames and support
@@ -30,9 +29,8 @@ IGW_ID=$(aws ec2 create-internet-gateway \
   --query 'InternetGateway.InternetGatewayId' \
   --output text \
   --tag-specifications "ResourceType=internet-gateway,Tags=[
-    {Key=Name,Value=week12-igw},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-igw},
+    {Key=Project,Value=$PROJECT_TAG}
   ]")
 
 # Create public subnet
@@ -43,9 +41,8 @@ PUBLIC_SUBNET_ID=$(aws ec2 create-subnet \
   --query 'Subnet.SubnetId' \
   --output text \
   --tag-specifications "ResourceType=subnet,Tags=[
-    {Key=Name,Value=week12-public-subnet},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-public-subnet},
+    {Key=Project,Value=$PROJECT_TAG}
   ]") 
 
 # Create private subnet
@@ -56,9 +53,8 @@ PRIVATE_SUBNET_ID=$(aws ec2 create-subnet \
   --query 'Subnet.SubnetId' \
   --output text \
   --tag-specifications "ResourceType=subnet,Tags=[
-    {Key=Name,Value=week12-private-subnet},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-private-subnet},
+    {Key=Project,Value=$PROJECT_TAG}
   ]")
 
 # Enable auto-assign public IP on subnet
@@ -75,9 +71,8 @@ PUBLIC_ROUTE_TABLE_ID=$(aws ec2 create-route-table \
   --query 'RouteTable.RouteTableId' \
   --output text \
   --tag-specifications "ResourceType=route-table,Tags=[
-    {Key=Name,Value=week12-public-rt},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-public-rt},
+    {Key=Project,Value=$PROJECT_TAG}
   ]")
 
 # Create private route table
@@ -86,9 +81,8 @@ PRIVATE_ROUTE_TABLE_ID=$(aws ec2 create-route-table \
   --query 'RouteTable.RouteTableId' \
   --output text \
   --tag-specifications "ResourceType=route-table,Tags=[
-    {Key=Name,Value=week12-private-rt},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-private-rt},
+    {Key=Project,Value=$PROJECT_TAG}
   ]")
 
 # Add 0.0.0.0/0 route to IGW
@@ -120,9 +114,8 @@ ALLOCATION_ID=$(aws ec2 allocate-address \
 # Tag elastic IP
 aws ec2 create-tags \
   --resources "$ALLOCATION_ID" \
-  --tags Key=Name,Value=week12-eip \
-         Key=Project,Value=$PROJECT_TAG \
-         Key=Week,Value=$WEEK_TAG
+  --tags Key=Name,Value=my-eip \
+         Key=Project,Value=$PROJECT_TAG
 
 # Create NAT Gateway
 NAT_ID=$(aws ec2 create-nat-gateway \
@@ -131,9 +124,8 @@ NAT_ID=$(aws ec2 create-nat-gateway \
   --query 'NatGateway.NatGatewayId' \
   --output text \
   --tag-specifications "ResourceType=natgateway,Tags=[
-    {Key=Name,Value=week12-nat},
-    {Key=Project,Value=$PROJECT_TAG},
-    {Key=Week,Value=$WEEK_TAG}
+    {Key=Name,Value=my-nat},
+    {Key=Project,Value=$PROJECT_TAG}
   ]") 
 
 # Wait for the NAT Gateway to be available
@@ -191,13 +183,13 @@ run_part_b() {
      BASTION_SG_ID=$(aws ec2 create-security-group \
      --vpc-id "$VPC_ID" \
      --group-name "$BASTION_SG_NAME" \
-     --description "Week 12 Bastion SG" \
+     --description "Bastion SG" \
      --query 'GroupId' \
      --output text)
 
      aws ec2 create-tags \
        --resources "$BASTION_SG_ID" \
-       --tags Key=Name,Value=week12-bastion-sg Key=Project,Value="$PROJECT_TAG" Key=Week,Value="$WEEK_TAG"
+       --tags Key=Name,Value=my-bastion-sg Key=Project,Value="$PROJECT_TAG"
 
      aws ec2 authorize-security-group-ingress \
        --group-id "$BASTION_SG_ID" \
@@ -215,13 +207,13 @@ run_part_b() {
     APP_SERVER_SG_ID=$(aws ec2 create-security-group \
       --vpc-id "$VPC_ID" \
       --group-name "$APP_SG_NAME" \
-      --description "Week 12 App SG" \
+      --description "App SG" \
       --query 'GroupId' \
       --output text)
 
     aws ec2 create-tags \
       --resources "$APP_SERVER_SG_ID" \
-      --tags Key=Name,Value=week12-app-server-sg Key=Project,Value="$PROJECT_TAG" Key=Week,Value="$WEEK_TAG"
+      --tags Key=Name,Value=my-app-server-sg Key=Project,Value="$PROJECT_TAG"
 
     aws ec2 authorize-security-group-ingress \
       --group-id "$APP_SERVER_SG_ID" \
@@ -305,7 +297,7 @@ BASTION_ID=$(aws ec2 run-instances \
   --key-name "$KEY_NAME" \
   --query 'Instances[0].InstanceId' \
   --output text \
-  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=week12-bastion},{Key=Project,Value=$PROJECT_TAG},{Key=Week,Value=$WEEK_TAG}]")
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=my-bastion},{Key=Project,Value=$PROJECT_TAG}]")
 
 echo "✅ Bastion launched: $BASTION_ID"
 
@@ -320,7 +312,7 @@ APP_SERVER_ID=$(aws ec2 run-instances \
   --user-data file://"$SCRIPT_DIR/userdata.sh" \
   --query 'Instances[0].InstanceId' \
   --output text \
-  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=week12-app-server},{Key=Project,Value=$PROJECT_TAG},{Key=Week,Value=$WEEK_TAG}]")
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=my-app-server},{Key=Project,Value=$PROJECT_TAG}]")
 
 echo "✅ App server launched: $APP_SERVER_ID"
 

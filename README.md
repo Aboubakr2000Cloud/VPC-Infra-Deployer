@@ -1,6 +1,5 @@
-# ☁️ Week 12 — VPC & Networking: `vpc-infra-deployer`
+# ☁️ VPC & Networking: `vpc-infra-deployer`
 
-> **Cloud Engineering Roadmap** · Week 12 of 24
 
 A fully scripted AWS network infrastructure tool that builds a production-structured VPC from scratch — public and private subnets, internet gateway, NAT gateway, bastion host, private app server with Nginx, IAM role for S3 access, and a VPC Gateway Endpoint — all wired together via Bash and the AWS CLI, zero console clicking.
 
@@ -8,7 +7,7 @@ A fully scripted AWS network infrastructure tool that builds a production-struct
 
 ## 📋 Overview
 
-In Week 11, EC2 instances lived in the default VPC — a shared, pre-configured network you don't control. This week I build **the network itself**.
+In cloud-nginx-deployer project, EC2 instances lived in the default VPC — a shared, pre-configured network you don't control. This project I build **the network itself**.
 
 `vpc-infra-deployer` automates the full lifecycle of a production-structured AWS network: VPC creation, subnet design, routing, NAT, secure bastion access, IAM-based S3 connectivity from a private subnet, and complete teardown in the correct dependency order. This is the same three-tier architecture pattern used in real production environments — public layer, private app layer, and secure data access — before any load balancer or database is added.
 
@@ -181,14 +180,13 @@ PRIVATE_SUBNET_CIDR="10.0.3.0/24"
 AZ="eu-west-1a"
 AMI_ID="ami-xxxxxxxxxxxxxxxxx"        # Ubuntu 22.04 LTS in your region
 INSTANCE_TYPE="t2.micro"
-KEY_NAME="week12-key"
-BASTION_SG_NAME="week12-bastion-sg"
-APP_SG_NAME="week12-app-sg"
-IAM_ROLE_NAME="week12-ec2-s3-role"
-IAM_PROFILE_NAME="week12-ec2-profile"
+KEY_NAME="my-key"
+BASTION_SG_NAME="my-bastion-sg"
+APP_SG_NAME="my-app-sg"
+IAM_ROLE_NAME="my-ec2-s3-role"
+IAM_PROFILE_NAME="my-ec2-profile"
 S3_BUCKET="your-existing-bucket-name"
 PROJECT_TAG="cloudpath"
-WEEK_TAG="12"
 ```
 
 > Find the correct Ubuntu 22.04 AMI ID for your region at [Ubuntu EC2 AMI Finder](https://cloud-images.ubuntu.com/locator/ec2/)
@@ -211,7 +209,7 @@ The script runs in 4 phases and prints progress at each step. On completion:
 ```
 Bastion IP: 54.x.x.x
 App private IP: 10.0.3.x
-ssh-add week12-key.pem
+ssh-add my-key.pem
 ssh -A ubuntu@54.x.x.x
 ssh ubuntu@10.0.3.x
 ```
@@ -220,7 +218,7 @@ ssh ubuntu@10.0.3.x
 
 **1. SSH into bastion:**
 ```bash
-ssh-add week12-key.pem
+ssh-add my-key.pem
 ssh -A ubuntu@<bastion-public-ip>
 ```
 
@@ -232,7 +230,7 @@ ssh ubuntu@<app-server-private-ip>
 **3. From app server — verify Nginx:**
 ```bash
 curl localhost
-# Returns your Week 12 HTML page
+# Returns your HTML page
 ```
 
 **4. From app server — verify NAT outbound:**
@@ -287,7 +285,3 @@ aws ec2 describe-route-tables \
 - How VPC Gateway Endpoints keep S3 traffic off the public internet for free
 - The correct dependency order for tearing down VPC infrastructure
 - How to build idempotent, re-entrant deployment scripts with state-gating
-
----
-
-*Part of the [Cloud Engineering Roadmap](https://github.com/<your-username>/cloud-engineering-roadmap) — from Linux to production-grade AWS infrastructure.*

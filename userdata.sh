@@ -26,12 +26,12 @@ cat > /var/www/html/index.html << EOF
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Week 12 VPC</title>
+    <title>VPC</title>
   </head>
   <body>
     <h1>Abou</h1>
-    <p>week 12: VPC</p>
-    <p>Week 12 — Private Subnet App Server</p>
+    <p>VPC</p>
+    <p>Private Subnet App Server</p>
     <p>Deployed at: $(date)</p>
   </body>
 </html>
